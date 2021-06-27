@@ -1,4 +1,4 @@
-server = "http://" + window.location.hostname + ":8088/janus";
+server = "http://" + window.location.hostname + ":7088/janus";
 
 var janus = null;
 var streaming = [];
