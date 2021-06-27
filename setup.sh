@@ -1,7 +1,40 @@
 #!/bin/bash
+set -e
 
 SCRIPTS=$PWD
 echo "Installing apt install requisites..."
+BUILD_PACKAGES=(
+    libmicrohttpd-dev
+    libjansson-dev
+    libnice-dev
+	libssl-dev
+    libsofia-sip-ua-dev
+    libglib2.0-dev
+	libopus-dev
+    libogg-dev
+    libcurl4-openssl-dev
+	pkg-config
+    gengetopt
+    libtool
+    automake
+    git
+    gcc
+    make
+)
+
+RUNTIME_PACKAGES=(
+    libconfig-dev
+    libconfig9
+    libnice10
+    libjansson4
+    libcurl4
+    libmicrohttpd12
+    libogg0
+)
+
+apt update
+apt install -y --no-install-recommends ${BUILD_PACKAGES[*]}
+apt install -y --no-install-recommends ${RUNTIME_PACKAGES[*]}
 
 cd /tmp
 
@@ -20,10 +53,17 @@ git clone https://github.com/meetecho/janus-gateway.git
 echo "building janus..."
 cd janus-gateway
 #git checkout tags/v0.4.4
-git checkout tags/v0.11.3
+#git checkout tags/v0.11.3
 sh autogen.sh
 ./configure --disable-data-channels --disable-rabbitmq --disable-docs --prefix=/opt/janus
 
 make -j15
 make install
 make configs
+
+apt -y remove ${BUILD_PACKAGES[*]}
+apt-mark hold ${RUNTIME_PACKAGES[*]}
+apt -y autoremove
+apt -y clean
+
+rm -r /tmp/*
