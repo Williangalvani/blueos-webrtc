@@ -1,4 +1,4 @@
-from bluerobotics/companion-base:v0.0.1
+from bluerobotics/companion-base:v0.0.2
 
 COPY setup.sh /setup.sh
 RUN /setup.sh
