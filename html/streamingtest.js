@@ -293,7 +293,7 @@ function updateStreamsList() {
 	streaming.send({ message: body, success: function(result) {
 		setTimeout(function() {
 			$('#update-streams').removeClass('fa-spin').click(updateStreamsList);
-		}, 500);
+		}, 200);
 		if(!result) {
 			bootbox.alert("Got no response to our query for available streams");
 			return;
@@ -324,7 +324,7 @@ function updateStreamsList() {
 				return false;
 
 			});
-			setTimeout(startStream, 1000);
+			setTimeout(startStream, 3000);
 		}
 	}});
 }
