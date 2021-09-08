@@ -20,7 +20,7 @@ BUILD_PACKAGES=(
     gcc
     make
     libnice-dev
-#    ninja-build
+    ninja-build
 )
 
 RUNTIME_PACKAGES=(
@@ -38,13 +38,13 @@ apt install -y --no-install-recommends ${BUILD_PACKAGES[*]}
 apt install -y --no-install-recommends ${RUNTIME_PACKAGES[*]}
 
 
-# pip install meson
-# git clone https://gitlab.freedesktop.org/libnice/libnice.git
-# cd libnice
-# git checkout 0.1.16
-# meson builddir
-# ninja -C builddir
-# ninja -C builddir install
+pip install meson
+git clone https://gitlab.freedesktop.org/libnice/libnice.git
+cd libnice
+#git checkout 0.1.16
+meson builddir
+ninja -C builddir
+ninja -C builddir install
 
 cd /tmp
 
