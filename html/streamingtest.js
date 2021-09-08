@@ -53,8 +53,6 @@ var streaming = null;
 var opaqueId = "streamingtest-"+Janus.randomString(12);
 
 var bitrateTimer = null;
-var spinner = null;
-
 var simulcastStarted = false, svcStarted = false;
 
 var selectedStream = null;
@@ -190,9 +188,7 @@ $(document).ready(function() {
 										$('#waitingvideo').remove();
 										if(this.videoWidth)
 											$('#remotevideo').removeClass('hide').show();
-										if(spinner)
-											spinner.stop();
-										spinner = null;
+
 										var videoTracks = stream.getVideoTracks();
 										if(!videoTracks || videoTracks.length === 0)
 											return;
@@ -252,9 +248,6 @@ $(document).ready(function() {
 								$('#stream').append(
 									'<input class="form-control" type="text" id="datarecv" disabled></input>'
 								);
-								if(spinner)
-									spinner.stop();
-								spinner = null;
 							},
 							ondata: function(data) {
 								Janus.debug("We got data from the DataChannel!", data);
@@ -363,12 +356,7 @@ function startStream() {
 	$('#watch').attr('disabled', true).unbind('click');
 	var body = { request: "watch", id: parseInt(selectedStream) || selectedStream};
 	streaming.send({ message: body });
-	if(spinner == null) {
-		var target = document.getElementById('stream');
-		spinner = new Spinner({top:100}).spin(target);
-	} else {
-		spinner.spin();
-	}
+
 	// Get some more info for the mountpoint to display, if any
 	getStreamInfo();
 }

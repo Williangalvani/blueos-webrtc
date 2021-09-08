@@ -9,11 +9,119 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
 <script type="text/javascript" src="janus.js" ></script>
 <script type="text/javascript" src="streamingtest.js"></script>
+<script src="Controller.min.js"></script>
+<script src="Controller.layouts.min.js"></script>
+
+<script>
+var map = {
+    "HOME": 5, // mapped to "shift" in params
+    "START": 6, // mapped to "arm"
+    "SELECT": 4, // mapped to "disarm"
+
+    "FACE_1": 15, // mapped to "manual"
+    "FACE_2": 2, // mapped to "depth hold"
+    "FACE_3": 3, // mapped to "stabilize"
+    "FACE_4": 1, // mapped to "poshold"
+
+    "DPAD_UP": 11, // mapped to "increase gain"
+    "DPAD_DOWN": 12, // mapped to "decrease gain"
+
+    "DPAD_LEFT": 14, // mapped to "increase gain"
+    "DPAD_RIGHT": 13, // mapped to "decrease gain"
+
+    "RIGHT_SHOULDER": 10,
+    "LEFT_SHOULDER": 9,
+
+    "LEFT_ANALOG_BUTTON": 7,
+    "RIGHT_ANALOG_BUTTON": 8,
+
+}
+
+var manualControlObject = {
+        "header": {
+            "system_id": 255,
+            "component_id": 0,
+            "sequence": 0
+        },
+        "message": {
+            "type":
+            "MANUAL_CONTROL",
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "r": 0.0,
+            "buttons": 0,
+            "target": 1
+        }
+    }
+
+var ws = new WebSocket("ws://localhost:8088/ws/mavlink?filter=HEARTBEAT");
+
+var state = {
+    roll: 0.0,
+    pitch: 0.0,
+    throttle: 0.0,
+    yaw: 0.0,
+    buttons: 0
+}
+
+function sendManualControl() {
+    manualControlObject.message.x = (state.pitch * 1000.0) | 0
+    manualControlObject.message.y = (state.roll * 1000.0) | 0
+    manualControlObject.message.z = (state.throttle * 500.0 + 500.0) | 0
+    manualControlObject.message.r = (state.yaw * 1000.0) | 0
+    manualControlObject.message.buttons = state.buttons
+    ws.send(JSON.stringify(manualControlObject))
+}
+
+Controller.search();
+window.addEventListener('gc.controller.found', function(event) {
+    var controller = event.detail.controller;
+    console.log("Controller found at index " + controller.index + ".");
+    console.log("'" + controller.name + "' is ready!");
+    setInterval(sendManualControl, 200)
+    }, false
+);
+
+window.addEventListener('gc.button.press', function(event) {
+    buttonNumber = map[event.detail.name] -1
+	console.log(buttonNumber+1)
+    state.buttons |= (2 << buttonNumber)
+    sendManualControl()
+}, false);
+
+window.addEventListener('gc.button.release', function(event) {
+    buttonNumber = map[event.detail.name] -1
+    state.buttons &= ~(2 << buttonNumber)
+    sendManualControl()
+}, false);
+
+
+window.addEventListener('gc.analog.change', function(event) {
+    var stick = event.detail;
+    if (stick.name === "RIGHT_ANALOG_STICK") {
+        state.throttle = -stick.position.y
+        state.yaw = stick.position.x
+        return
+    }
+    if (stick.name === "LEFT_ANALOG_STICK") {
+        state.pitch = -stick.position.y
+        state.roll = stick.position.x
+        return
+    }
+
+})
+
+</script>
+
+
 <body>
-	<div id="streams">
-		<div>
-			<div id="stream"></div>
-		</div>
-	</div>
+    <div id="streams">
+        <span id="gamepad-info"></span>
+        <div>
+            <div id="stream"></div>
+        </div>
+    </div>
 </body>
+
 </html>
