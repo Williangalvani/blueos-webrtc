@@ -36,6 +36,29 @@ apt update
 apt install -y --no-install-recommends ${BUILD_PACKAGES[*]}
 apt install -y --no-install-recommends ${RUNTIME_PACKAGES[*]}
 
+BUILD_PACKAGES=(
+    libmicrohttpd-dev
+    libjansson-dev
+    libnice-dev
+	libssl-dev
+    libsofia-sip-ua-dev
+    libglib2.0-dev
+	libopus-dev
+    libogg-dev
+    libcurl4-openssl-dev
+	pkg-config
+    gengetopt
+    libtool
+    automake
+    git
+    gcc
+    make
+    libconfig-dev
+)
+
+apt update
+apt install -y --no-install-recommends ${BUILD_PACKAGES[*]}
+
 cd /tmp
 
 echo "Installing libsrtp.."
