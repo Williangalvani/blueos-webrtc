@@ -55,7 +55,7 @@ var manualControlObject = {
         }
     }
 
-var ws = new WebSocket("ws://localhost:8088/ws/mavlink?filter=HEARTBEAT");
+var ws = new WebSocket(`ws://${window.location.hostname}/mavlink2rest/ws/mavlink?filter=HEARTBEAT`);
 
 var state = {
     roll: 0.0,
