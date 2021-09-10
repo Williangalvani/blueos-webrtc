@@ -10,7 +10,6 @@
 <script type="text/javascript" src="janus.js" ></script>
 <script type="text/javascript" src="streamingtest.js"></script>
 <script src="Controller.min.js"></script>
-<script src="Controller.layouts.min.js"></script>
 
 <script>
 var map = {
@@ -34,7 +33,6 @@ var map = {
 
     "LEFT_ANALOG_BUTTON": 7,
     "RIGHT_ANALOG_BUTTON": 8,
-
 }
 
 var manualControlObject = {
@@ -54,6 +52,37 @@ var manualControlObject = {
             "target": 1
         }
     }
+
+    var a = {
+    match: "ipega Extending Game controller",
+    name: "ipega Extending Game controller",
+    description: "A wired, PS3-style controller.",
+    buttons: {
+      FACE_1: 0,
+      FACE_2: 1,
+      FACE_3: 2,
+      FACE_4: 3,
+      LEFT_SHOULDER: 6,
+      RIGHT_SHOULDER: 7,
+      LEFT_SHOULDER_BOTTOM: 4,
+      RIGHT_SHOULDER_BOTTOM: 5,
+      LEFT_ANALOG_BUTTON: 10,
+      RIGHT_ANALOG_BUTTON: 11,
+      START: 9,
+      SELECT: 8,
+      DPAD_UP: 12,
+      DPAD_DOWN: 13,
+      DPAD_LEFT: 14,
+      DPAD_RIGHT: 15,
+    },
+    axes: {
+      LEFT_ANALOG_STICK_HOR: 0,
+      LEFT_ANALOG_STICK_VERT: 1,
+      RIGHT_ANALOG_STICK_HOR: 2,
+      RIGHT_ANALOG_STICK_VERT: 3,
+    },
+  };
+  Controller.layouts.register(a);
 
 var ws = new WebSocket(`ws://${window.location.hostname}/mavlink2rest/ws/mavlink?filter=HEARTBEAT`);
 
@@ -77,6 +106,7 @@ function sendManualControl() {
 Controller.search();
 window.addEventListener('gc.controller.found', function(event) {
     var controller = event.detail.controller;
+    console.log(controller)
     console.log("Controller found at index " + controller.index + ".");
     console.log("'" + controller.name + "' is ready!");
     setInterval(sendManualControl, 200)
@@ -84,6 +114,7 @@ window.addEventListener('gc.controller.found', function(event) {
 );
 
 window.addEventListener('gc.button.press', function(event) {
+    console.log(event.detail)
     buttonNumber = map[event.detail.name] -1
 	console.log(buttonNumber+1)
     state.buttons |= (2 << buttonNumber)
