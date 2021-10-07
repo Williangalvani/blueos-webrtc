@@ -9,6 +9,7 @@
 <script type="text/javascript" src="jquery.min.js" ></script>
 <script type="text/javascript" src="janus.js" ></script>
 <script type="text/javascript" src="streamingtest.js"></script>
+<link rel="stylesheet" type="text/css" href="flightindicators.min.css" />
 <script src="Controller.min.js"></script>
 
 <script>
@@ -116,7 +117,7 @@ window.addEventListener('gc.controller.found', function(event) {
 window.addEventListener('gc.button.press', function(event) {
     console.log(event.detail)
     buttonNumber = map[event.detail.name] -1
-	console.log(buttonNumber+1)
+    console.log(buttonNumber+1)
     state.buttons |= (2 << buttonNumber)
     sendManualControl()
 }, false);
@@ -147,6 +148,14 @@ window.addEventListener('gc.analog.change', function(event) {
 
 
 <body>
+    <ul id="menu">
+        <input type="checkbox" id="collapse"/>
+        <label for="collapse"></label>
+        <li id='placeholder'>NO data...</li>
+      </ul>
+  <span class="draggable ui-widget-content" style="position: absolute;" id="attitude"></span>
+  <span class="draggable ui-widget-content" style="position: absolute;" id="heading"></span>
+
     <div id="streams">
         <span id="gamepad-info"></span>
         <div>
@@ -154,5 +163,75 @@ window.addEventListener('gc.analog.change', function(event) {
         </div>
     </div>
 </body>
+
+<!-- Importing jQuery library -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+<!-- Importing the FlightIndicators library -->
+<script src="jquery.flightindicators.min.js"></script>
+
+<script>
+
+var dados = `{"SCALED_IMU2": {"xacc": 41, "xmag": 0, "zgyro": 1, "yacc": -17, "ymag": 0, "zmag": 0, "xgyro": -5, "zacc": -990, "ygyro": -4, "time_boot_ms": 143809}, "RAW_IMU": {"xacc": 12, "xmag": 62, "zgyro": 1, "yacc": -2, "ymag": -182, "zmag": -127, "xgyro": -2, "zacc": -1010, "time_usec": 143809240, "ygyro": 0}, "GPS_RAW_INT": {"epv": 65535, "lat": 0, "h_acc": 0, "eph": 65535, "v_acc": 0, "alt": 0, "cog": 0, "lon": 0, "time_usec": 0, "vel": 0, "alt_ellipsoid": 0, "satellites_visible": 0, "vel_acc": 0, "hdg_acc": 0, "fix_type": 0}, "BAD_DATA": {"reason": "Bad prefix", "data": ""}, "AOA_SSA": {"AOA": 0.0, "time_usec": 143888896, "SSA": 0.0}, "TIMESYNC": {"ts1": 135768860001, "tc1": 0}, "MEMINFO": {"freemem": 65535, "freemem32": 86008, "brkval": 0}, "AHRS": {"accel_weight": 0.0, "error_yaw": 0.07836753875017166, "error_rp": 0.0034893483389168978, "omegaIy": 0.001871259300969541, "renorm_val": 0.0, "omegaIz": -0.00187807553447783, "omegaIx": -0.003143602516502142}, "VIBRATION": {"clipping_2": 0, "vibration_y": 0.025101788341999054, "clipping_1": 2, "time_usec": 143809209, "clipping_0": 0, "vibration_z": 0.040749691426754, "vibration_x": 0.024104725569486618}, "WIND": {"speed_z": 0.0, "speed": 0.0, "direction": -180.0}, "HEARTBEAT": {"type": 1, "base_mode": 89, "custom_mode": 11, "mavlink_version": 3, "system_status": 5, "autopilot": 3}, "SCALED_PRESSURE": {"press_diff": 0.0, "press_abs": 1021.7727661132812, "temperature": 3445, "time_boot_ms": 143809}, "HWSTATUS": {"Vcc": 4647, "I2Cerr": 0}, "VFR_HUD": {"climb": -0.21608500182628632, "heading": 68, "throttle": 0, "groundspeed": 0.0, "airspeed": 0.0, "alt": 1.0699999332427979}, "POWER_STATUS": {"Vservo": 7, "Vcc": 4581, "flags": 4}, "MISSION_CURRENT": {"seq": 0}, "PARAM_VALUE": {"param_value": 1.0, "param_id": "LAND_DS_AIL_SCL", "param_type": 9, "param_count": 827, "param_index": 826}, "EKF_STATUS_REPORT": {"flags": 0, "terrain_alt_variance": 0.0, "compass_variance": 0.0, "pos_vert_variance": 0.0, "velocity_variance": 0.0, "airspeed_variance": 0.0, "pos_horiz_variance": 0.0}, "SYSTEM_TIME": {"time_unix_usec": 0, "time_boot_ms": 143808}, "SENSOR_OFFSETS": {"gyro_cal_x": 0.0018533857073634863, "gyro_cal_z": -0.028456274420022964, "raw_temp": 3431, "gyro_cal_y": 0.03439798206090927, "mag_ofs_y": -106, "raw_press": 102177, "mag_ofs_x": 206, "accel_cal_x": 0.02865334413945675, "mag_declination": 0.0, "mag_ofs_z": 58, "accel_cal_y": -0.36243757605552673, "accel_cal_z": -1.041106104850769}, "GLOBAL_POSITION_INT": {"lat": 0, "hdg": 6818, "lon": 0, "relative_alt": 1072, "vy": 0, "vx": 0, "alt": 1070, "vz": 0, "time_boot_ms": 143848}, "SERVO_OUTPUT_RAW": {"servo10_raw": 0, "servo13_raw": 0, "servo7_raw": 0, "servo2_raw": 0, "servo5_raw": 0, "servo11_raw": 0, "servo6_raw": 0, "time_usec": 143788849, "servo1_raw": 0, "servo12_raw": 0, "servo9_raw": 0, "servo8_raw": 0, "servo3_raw": 1100, "servo15_raw": 0, "servo4_raw": 0, "port": 0, "servo16_raw": 0, "servo14_raw": 0}, "STATUSTEXT": {"text": "fmuv2 0043001E 33365109 36353335", "severity": 6}, "AHRS3": {"v4": 0.0, "lat": 0, "yaw": 0.0, "v2": 0.0, "lng": 0, "altitude": 0.0, "pitch": 0.010244916193187237, "roll": -0.01728755608201027, "v1": 0.0, "v3": 0.0}, "RC_CHANNELS": {"chancount": 0, "chan1_raw": 1500, "rssi": 0, "chan16_raw": 0, "chan18_raw": 0, "chan4_raw": 1500, "chan2_raw": 1500, "chan6_raw": 0, "chan7_raw": 0, "chan13_raw": 0, "chan11_raw": 0, "chan9_raw": 0, "chan3_raw": 0, "chan15_raw": 0, "chan10_raw": 0, "chan14_raw": 0, "chan5_raw": 0, "chan12_raw": 0, "chan17_raw": 0, "chan8_raw": 0, "time_boot_ms": 143788}, "RC_CHANNELS_RAW": {"time_boot_ms": 119549, "chan1_raw": 1500, "rssi": 0, "chan7_raw": 0, "port": 0, "chan5_raw": 0, "chan4_raw": 1500, "chan3_raw": 0, "chan2_raw": 1500, "chan8_raw": 0, "chan6_raw": 0}, "ATTITUDE": {"yaw": 1.190525770187378, "yawspeed": 0.0008303900249302387, "pitch": 0.04873151332139969, "roll": 0.0014504020800814033, "rollspeed": -0.00241764634847641, "pitchspeed": -0.000732339103706181, "time_boot_ms": 143888}, "NAV_CONTROLLER_OUTPUT": {"nav_roll": 0.0, "nav_pitch": 0.0, "nav_bearing": 0, "aspd_error": 0.0, "xtrack_error": 0.0, "alt_error": 98.93000030517578, "wp_dist": 0, "target_bearing": 0}, "POSITION_TARGET_GLOBAL_INT": {"vz": 0.0, "alt": 100.0, "coordinate_frame": 5, "yaw": 0.0, "yaw_rate": 0.0, "afz": 0.0, "afy": 0.0, "type_mask": 65528, "vx": 0.0, "afx": 0.0, "lon_int": 0, "lat_int": 0, "vy": 0.0, "time_boot_ms": 143869}, "SYS_STATUS": {"onboard_control_sensors_present": 56753183, "errors_comm": 0, "current_battery": -1, "onboard_control_sensors_health": 19987471, "errors_count2": 0, "errors_count4": 0, "battery_remaining": -1, "errors_count3": 0, "voltage_battery": 0, "load": 45, "errors_count1": 0, "drop_rate_comm": 0, "onboard_control_sensors_enabled": 6388767}}`
+
+var initialDict = undefined;
+var attitude = $.flightIndicator('#attitude', 'attitude', {roll:0, pitch:0, size:200, showBox : false});
+var heading = $.flightIndicator('#heading', 'heading', {heading:150, showBox:false});
+
+// Update at 20Hz
+var increment = 0;
+
+function processRequest(data) {
+    if(initialDict===undefined) {
+        initialDict = data;
+        $("#placeholder").remove();
+        for(var item of Object.keys(initialDict)) {
+            $("#menu").append("<li class='firstlayer'>" + item + "</li>");
+        }
+        $('.firstlayer').click(function(){ 
+            $('.firstlayer').remove();
+            console.log($(this).text());
+            for(var item of Object.keys(initialDict[$(this).text()])) {
+                $("#menu").append("<li class='secondlayer' firstitem='" + $(this).text() + "'>" + item + "</li>");
+            }
+            $('.secondlayer').click(function(){ 
+                var name = $(this).attr('firstitem') + "-" + $(this).text();
+                $('body').append("<span class='dataview draggable ui-widget-content' id='" + name + "'>" + name + "</span>");
+                console.log("#"+name)
+                $("#" + name).draggable({ grid: [ 50, 50 ], containment: "parent"  });
+                $(".secondlayer").remove();
+                initialDict = undefined;
+                $("#collapse").click();
+
+            });
+        })
+    }
+
+    $('.dataview').each(function() {
+      var fields = $(this).attr('id').split('-');
+      $(this).text(fields[1] + ": " + data[fields[0]][fields[1]]);
+      try{
+          $(this).text(fields[1] + ": " + data[fields[0]][fields[1]].toFixed(1));
+      } catch (e) {}
+    })
+  
+    attitude.setRoll(0 - (data.ATTITUDE.roll * 180 / Math.PI));
+    attitude.setPitch(data.ATTITUDE.pitch * 180 / Math.PI);
+    heading.setHeading(data.ATTITUDE.yaw * 180 / Math.PI);
+}
+
+setInterval(function() {
+$.getJSON("/mavlink").success(processRequest)
+//processRequest(JSON.parse(dados))
+}, 100);
+
+</script>
+<script>
+    $( function() {
+        $( "#attitude" ).draggable({ grid: [ 50, 50 ], containment: "parent"  });
+        $( "#heading" ).draggable({ grid: [ 50, 50 ], containment: "parent"  });
+    } );
+    </script>
 
 </html>
