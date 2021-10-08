@@ -12,6 +12,105 @@
 <link rel="stylesheet" type="text/css" href="flightindicators.min.css" />
 <script src="Controller.min.js"></script>
 
+<style>
+
+video {
+    position: absolute;
+    top: 0;
+    z-index: -1;
+}
+
+
+body{
+  font-family:Helvetica,Arial;
+  margin:0 auto;
+  background: rgba(0,0,0,0);
+  color:white;
+}
+ul{
+  list-style:none;
+  margin:0;
+  padding:0;
+  width:200px;
+  margin:20px;
+}
+ul li{
+  display:block;
+  height:15px;
+  padding:5px;
+  border-top:1px solid rgba(255,255,255,.1);
+  transition:all .5s;
+  opacity:0;
+  -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  font-weight: 1000;
+}
+ul li:hover{
+  background:#ccc;
+}
+ul li:last-child{
+  border-bottom-left-radius:4px;
+  border-bottom-right-radius:4px;
+}
+label:before{
+  height:2px;
+  width:20px;
+  background:#333;
+  display:inline-block;
+  content:"";
+  box-shadow:0px -5px 0px 0px  #333,
+             0px -10px 0px 0px #333;
+  margin-right:10px;
+  transition:all .5s;
+  position:relative;
+  opacity:1;
+}
+label{
+  display:block;
+  padding:10px;
+  color:white;
+  cursor:pointer;
+  opacity:0;
+  -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  font-weight: 1000;
+}
+label:hover{
+  opacity:1;
+}
+input[type="checkbox"]{
+  visibility:hidden;
+  position:absolute;
+}
+#collapse:checked ~ li{
+  margin-top:0;
+  opacity:1;
+}
+#collapse:checked + label:before{
+  position:relative;
+  right:calc(-160px);
+  opacity:0.5;
+}
+
+span {
+  position: absolute;
+}
+
+span:hover {
+  cursor: hand;
+}
+
+span {
+  -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  font-weight: 1000;
+}
+
+</style>
+
 <script>
 var map = {
     "HOME": 5, // mapped to "shift" in params
@@ -85,7 +184,7 @@ var manualControlObject = {
   };
   Controller.layouts.register(a);
 
-var ws = new WebSocket(`ws://${window.location.hostname}/mavlink2rest/ws/mavlink?filter=HEARTBEAT`);
+var ws = new WebSocket(`ws://companion.local/mavlink2rest/ws/mavlink?filter=HEARTBEAT`);
 
 var state = {
     roll: 0.0,
@@ -183,19 +282,23 @@ var heading = $.flightIndicator('#heading', 'heading', {heading:150, showBox:fal
 var increment = 0;
 
 function processRequest(data) {
+    console.log(data)
+    data = data.messages;
     if(initialDict===undefined) {
         initialDict = data;
         $("#placeholder").remove();
+        console.log(initialDict);
         for(var item of Object.keys(initialDict)) {
             $("#menu").append("<li class='firstlayer'>" + item + "</li>");
         }
-        $('.firstlayer').click(function(){ 
+        $('.firstlayer').click(function(){
             $('.firstlayer').remove();
             console.log($(this).text());
-            for(var item of Object.keys(initialDict[$(this).text()])) {
+            console.log()
+            for(var item of Object.keys(initialDict[$(this).text()].message)) {
                 $("#menu").append("<li class='secondlayer' firstitem='" + $(this).text() + "'>" + item + "</li>");
             }
-            $('.secondlayer').click(function(){ 
+            $('.secondlayer').click(function(){
                 var name = $(this).attr('firstitem') + "-" + $(this).text();
                 $('body').append("<span class='dataview draggable ui-widget-content' id='" + name + "'>" + name + "</span>");
                 console.log("#"+name)
@@ -210,21 +313,20 @@ function processRequest(data) {
 
     $('.dataview').each(function() {
       var fields = $(this).attr('id').split('-');
-      $(this).text(fields[1] + ": " + data[fields[0]][fields[1]]);
+      $(this).text(fields[1] + ": " + data[fields[0]].message[fields[1]]);
       try{
-          $(this).text(fields[1] + ": " + data[fields[0]][fields[1]].toFixed(1));
+          $(this).text(fields[1] + ": " + data[fields[0]].message[fields[1]].toFixed(1));
       } catch (e) {}
     })
-  
-    attitude.setRoll(0 - (data.ATTITUDE.roll * 180 / Math.PI));
-    attitude.setPitch(data.ATTITUDE.pitch * 180 / Math.PI);
-    heading.setHeading(data.ATTITUDE.yaw * 180 / Math.PI);
+    attitude.setRoll(0 - (data.ATTITUDE.message.roll * 180 / Math.PI));
+    attitude.setPitch(data.ATTITUDE.message.pitch * 180 / Math.PI);
+    heading.setHeading(data.ATTITUDE.message.yaw * 180 / Math.PI);
 }
 
 setInterval(function() {
-$.getJSON("/mavlink").success(processRequest)
+$.getJSON("http://companion.local/mavlink2rest/mavlink/vehicles/1/components/1").success(processRequest)
 //processRequest(JSON.parse(dados))
-}, 100);
+}, 2000);
 
 </script>
 <script>
