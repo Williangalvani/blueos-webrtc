@@ -8,6 +8,7 @@
 <title>Janus WebRTC Server: Streaming Demo</title>
 <script type="text/javascript" src="adapter.min.js" ></script>
 <script type="text/javascript" src="jquery.min.js" ></script>
+<script src="jquery.ui.touch-punch.min.js"></script>
 <script type="text/javascript" src="janus.js" ></script>
 <script type="text/javascript" src="streamingtest.js"></script>
 <link rel="stylesheet" type="text/css" href="flightindicators.min.css" />
@@ -21,8 +22,16 @@ video {
     z-index: -1;
 }
 
+a#fullscreen:-webkit-full-screen {
+    display: none;
+}
+
 html {
   height: 100%;
+}
+
+span.hud {
+float: left;
 }
 
 body{
@@ -39,6 +48,7 @@ ul{
   padding:0;
   width:200px;
   margin:20px;
+  position: absolute;
 }
 ul li{
   display:block;
@@ -101,7 +111,7 @@ input[type="checkbox"]{
 }
 
 span {
-  position: absolute;
+  margin-left: 15px;
 }
 
 span:hover {
@@ -139,6 +149,19 @@ var map = {
 
     "LEFT_ANALOG_BUTTON": 7,
     "RIGHT_ANALOG_BUTTON": 8,
+}
+
+let modeMappingSub = {
+    0: 'STABILIZE',
+    1: 'ACRO',
+    2: 'ALT_HOLD',
+    3: 'AUTO',
+    4: 'GUIDED',
+    7: 'CIRCLE',
+    9: 'SURFACE',
+    16: 'POSHOLD',
+    19: 'MANUAL',
+    20: 'MOTOR_DETECT'
 }
 
 var manualControlObject = {
@@ -262,14 +285,16 @@ window.addEventListener('gc.analog.change', function(event) {
         <label for="collapse"></label>
         <li id='placeholder'>NO data...</li>
       </ul>
-  <span class="draggable ui-widget-content" style="position: absolute;" id="attitude"></span>
-  <span class="draggable ui-widget-content" style="position: absolute;" id="heading"></span>
+  <span class="draggable ui-widget-content" style="position: absolute; bottom:0;right:0" id="attitude"></span>
+  <span class="draggable ui-widget-content" style="position: absolute; top:0;right:0;" id="heading"></span>
     <div id="streams">
         <span id="gamepad-info"></span>
         <div>
             <div id="stream"></div>
         </div>
     </div>
+    <span class="hud draggable ui-widget-content" id="armstatus"></span>
+    <span class="hud draggable ui-widget-content" id="mode"></span>
 </body>
 
 <!-- Importing jQuery library -->
@@ -309,9 +334,9 @@ function processRequest(data) {
             }
             $('.secondlayer').click(function(){
                 var name = $(this).attr('firstitem') + "-" + $(this).text();
-                $('body').append("<span class='dataview draggable ui-widget-content' id='" + name + "'>" + name + "</span>");
+                $('body').append("<span class='hud dataview draggable ui-widget-content' id='" + name + "'>" + name + "</span>");
                 console.log("#"+name)
-                $("#" + name).draggable({ grid: [ 50, 50 ], containment: "parent"  });
+                //$("#" + name).draggable({ grid: [ 50, 50 ], containment: "parent"  });
                 $(".secondlayer").remove();
                 initialDict = undefined;
                 $("#collapse").click();
@@ -331,6 +356,8 @@ function processRequest(data) {
     attitude.setRoll(0 - (data.ATTITUDE.message.roll * 180 / Math.PI));
     attitude.setPitch(data.ATTITUDE.message.pitch * 180 / Math.PI);
     heading.setHeading(data.ATTITUDE.message.yaw * 180 / Math.PI);
+    $("#armstatus").text((data.HEARTBEAT.message.base_mode.bits & 0b10000000) === 128 ? 'Armed' : 'Disarmed');
+    $("#mode").text(modeMappingSub[data.HEARTBEAT.message.custom_mode]);
 }
 
 setInterval(function() {
@@ -355,8 +382,8 @@ function setFullScreen() {
 </script>
 <script>
     $( function() {
-        $( "#attitude" ).draggable({ grid: [ 50, 50 ], containment: "parent"  });
-        $( "#heading" ).draggable({ grid: [ 50, 50 ], containment: "parent"  });
+        $( "#attitude" ).draggable({ grid: [ 50, 10 ], containment: "parent"  });
+        $( "#heading" ).draggable({ grid: [ 50, 10 ], containment: "parent"  });
     } );
     </script>
 
