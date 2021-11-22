@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -20,12 +21,17 @@ video {
     z-index: -1;
 }
 
+html {
+  height: 100%;
+}
 
 body{
   font-family:Helvetica,Arial;
   margin:0 auto;
   background: rgba(0,0,0,0);
   color:white;
+  height: 100%;
+  min-height: 100%;
 }
 ul{
   list-style:none;
@@ -184,7 +190,10 @@ var manualControlObject = {
   };
   Controller.layouts.register(a);
 
-var ws = new WebSocket(`ws://companion.local/mavlink2rest/ws/mavlink?filter=HEARTBEAT`);
+
+var host = window.location.hostname
+
+var ws = new WebSocket(`ws://${window.location.hostname}/mavlink2rest/ws/mavlink?filter=HEARTBEAT`);
 
 var state = {
     roll: 0.0,
@@ -247,6 +256,7 @@ window.addEventListener('gc.analog.change', function(event) {
 
 
 <body>
+    <a id="fullscreen" style="color: black;" onclick="setFullScreen()">fullscreen</a>
     <ul id="menu">
         <input type="checkbox" id="collapse"/>
         <label for="collapse"></label>
@@ -254,7 +264,6 @@ window.addEventListener('gc.analog.change', function(event) {
       </ul>
   <span class="draggable ui-widget-content" style="position: absolute;" id="attitude"></span>
   <span class="draggable ui-widget-content" style="position: absolute;" id="heading"></span>
-
     <div id="streams">
         <span id="gamepad-info"></span>
         <div>
@@ -282,7 +291,7 @@ var heading = $.flightIndicator('#heading', 'heading', {heading:150, showBox:fal
 var increment = 0;
 
 function processRequest(data) {
-    console.log(data)
+    console.log(data);
     data = data.messages;
     if(initialDict===undefined) {
         initialDict = data;
@@ -318,15 +327,30 @@ function processRequest(data) {
           $(this).text(fields[1] + ": " + data[fields[0]].message[fields[1]].toFixed(1));
       } catch (e) {}
     })
+    console.log(data.ATTITUDE)
     attitude.setRoll(0 - (data.ATTITUDE.message.roll * 180 / Math.PI));
     attitude.setPitch(data.ATTITUDE.message.pitch * 180 / Math.PI);
     heading.setHeading(data.ATTITUDE.message.yaw * 180 / Math.PI);
 }
 
 setInterval(function() {
-$.getJSON("http://companion.local/mavlink2rest/mavlink/vehicles/1/components/1").success(processRequest)
+$.getJSON(`http://${window.location.hostname}/mavlink2rest/mavlink/vehicles/1/components/1`).success(processRequest)
 //processRequest(JSON.parse(dados))
-}, 2000);
+}, 1000);
+
+var elem = document.documentElement;
+
+/* View in fullscreen */
+function setFullScreen() {
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
+
 
 </script>
 <script>
@@ -337,3 +361,4 @@ $.getJSON("http://companion.local/mavlink2rest/mavlink/vehicles/1/components/1")
     </script>
 
 </html>
+
