@@ -1,0 +1,9 @@
+{
+    "name":"WebRCT",
+    "description":"Janus Gateway WebRCT extension",
+    "icon":"mdi-video-account",
+    "company":"Willian Galvani",
+    "version":"0.0.1",
+    "webpage":"https://github.com/williangalvani/companion-webrtc",
+    "api":""
+ }
