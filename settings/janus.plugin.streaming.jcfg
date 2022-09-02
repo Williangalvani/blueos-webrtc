@@ -145,17 +145,6 @@ general: {
 # this mountpoint will listen to the same broadcast as if it were live.
 # Notice that file-based streaming supports Opus files too, but no video.
 #
-file-live-sample: {
-	type = "live"
-	id = 2
-	description = "a-law file source (radio broadcast)"
-	filename = "@streamdir@/radio.alaw"
-	audio = true
-	video = false
-	secret = "adminpwd"
-}
-
-#
 # This is another sample of the file-based streaming support, but using
 # the "ondemand" type instead. In this case, the file we're streaming
 # contains raw mu-Law (still G.711) frames. Since this is "ondemand",
@@ -163,15 +152,6 @@ file-live-sample: {
 # of the stream, meaning that it will start from the beginning and then
 # loop when it's over. On-demand streaming supports Opus files as well.
 #
-file-ondemand-sample: {
-	type = "ondemand"
-	id = 3
-	description = "mu-law file source (music)"
-	filename = "@streamdir@/music.mulaw"
-	audio = true
-	video = false
-	secret = "adminpwd"
-}
 
 #
 # All browsers also support H.264, often through Cisco's OpenH264 plugin.

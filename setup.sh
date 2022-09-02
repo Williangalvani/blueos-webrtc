@@ -12,7 +12,9 @@ BUILD_PACKAGES=(
 	libopus-dev
     libogg-dev
     libcurl4-openssl-dev
-	pkg-config
+    liblua5.3-dev
+	libconfig-dev
+    pkg-config
     gengetopt
     libtool
     automake
@@ -53,7 +55,7 @@ wget https://github.com/cisco/libsrtp/archive/v2.2.0.tar.gz
 tar -zxvf v2.2.0.tar.gz
 cd libsrtp-2.2.0
 ./configure --prefix=/usr --enable-openssl
-make shared_library -j4 && make install
+make shared_library -j10 && make install
 
 cd ..
 
