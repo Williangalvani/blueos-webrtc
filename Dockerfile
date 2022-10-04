@@ -6,7 +6,7 @@ RUN /setup.sh
 COPY settings/* /opt/janus/etc/janus/
 COPY html /html
 
-LABEL version="1.0"
+LABEL version="1.0.0"
 LABEL permissions '\
 {\
     "NetworkMode": "host"\
